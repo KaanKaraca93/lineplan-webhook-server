@@ -2,12 +2,47 @@ const express = require('express');
 const axios = require('axios');
 const XLSX = require('xlsx');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+
+// Swagger UI endpoint
+app.get('/api-docs', (req, res) => {
+    res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>LinePlan Webhook Server API Documentation</title>
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui.css" />
+    </head>
+    <body>
+        <div id="swagger-ui"></div>
+        <script src="https://unpkg.com/swagger-ui-dist@4.15.5/swagger-ui-bundle.js"></script>
+        <script>
+            SwaggerUIBundle({
+                url: '/swagger.yaml',
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.presets.standalone
+                ],
+                layout: "StandaloneLayout"
+            });
+        </script>
+    </body>
+    </html>
+    `);
+});
+
+// Swagger YAML endpoint
+app.get('/swagger.yaml', (req, res) => {
+    res.setHeader('Content-Type', 'text/yaml');
+    res.sendFile(path.join(__dirname, 'swagger.yaml'));
+});
 
 // Token alma fonksiyonu
 async function getToken() {
@@ -438,4 +473,5 @@ app.listen(PORT, () => {
     console.log(`📡 Webhook URL: http://localhost:${PORT}/webhook`);
     console.log(`🧪 Test URL: http://localhost:${PORT}/test`);
     console.log(`💚 Health URL: http://localhost:${PORT}/health`);
+    console.log(`📚 API Docs: http://localhost:${PORT}/api-docs`);
 });

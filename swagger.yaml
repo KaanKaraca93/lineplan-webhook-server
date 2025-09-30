@@ -1,0 +1,284 @@
+openapi: 3.0.3
+info:
+  title: LinePlan Webhook Server API
+  description: |
+    PLM LinePlan verilerini Excel dosyaları ile senkronize eden webhook servisi.
+    
+    Bu API, ION'dan gelen webhook isteklerini alır, Excel dosyalarını indirir,
+    PLM LinePlan verilerini çeker, Excel verileri ile eşleştirir ve güncellenmiş
+    verileri PLM'e geri gönderir.
+  version: 1.0.0
+  contact:
+    name: Kaan Karaca
+    email: kaan.karaca93@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://lineplan-webhook-server-4b186ab9c265.herokuapp.com
+    description: Production Heroku Server
+  - url: http://localhost:3000
+    description: Local Development Server
+
+paths:
+  /webhook:
+    post:
+      tags:
+        - Webhook
+      summary: LinePlan Excel Synchronization Webhook
+      description: |
+        ION'dan gelen webhook isteğini işler. Sezon kodu ve Excel dosya URL'i alır,
+        Excel dosyasını indirir, PLM LinePlan verilerini çeker, eşleştirme yapar
+        ve güncellenmiş verileri PLM'e geri gönderir.
+      operationId: processLinePlanWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - season
+                - excelUrl
+              properties:
+                season:
+                  type: string
+                  description: Sezon kodu (örn. "25Y", "26S")
+                  example: "25Y"
+                excelUrl:
+                  type: string
+                  format: uri
+                  description: Excel dosyasının tam URL'i
+                  example: "https://example.com/files/lineplan-data.xlsx"
+              example:
+                season: "25Y"
+                excelUrl: "https://example.com/files/lineplan-data.xlsx"
+      responses:
+        '200':
+          description: İşlem başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "İşlem başarılı"
+                  data:
+                    type: object
+                    properties:
+                      processedCount:
+                        type: integer
+                        description: Toplam işlenen LinePlanLine sayısı
+                        example: 150
+                      matchedCount:
+                        type: integer
+                        description: Excel ile eşleşen kayıt sayısı
+                        example: 45
+                      postedCount:
+                        type: integer
+                        description: PLM'e gönderilen kayıt sayısı
+                        example: 45
+                    example:
+                      processedCount: 150
+                      matchedCount: 45
+                      postedCount: 45
+              example:
+                success: true
+                message: "İşlem başarılı"
+                data:
+                  processedCount: 150
+                  matchedCount: 45
+                  postedCount: 45
+        '400':
+          description: Geçersiz istek parametreleri
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "season ve excelUrl parametreleri gerekli"
+              example:
+                success: false
+                error: "season ve excelUrl parametreleri gerekli"
+        '500':
+          description: Sunucu hatası
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "PLM API bağlantı hatası"
+              example:
+                success: false
+                error: "PLM API bağlantı hatası"
+
+  /test:
+    get:
+      tags:
+        - Test
+      summary: Test Endpoint
+      description: |
+        Servisi test etmek için kullanılan endpoint. Sabit test verileri ile
+        LinePlan işlemini simüle eder.
+      operationId: testLinePlanService
+      responses:
+        '200':
+          description: Test başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Test başarılı"
+                  data:
+                    type: object
+                    properties:
+                      processedCount:
+                        type: integer
+                        example: 150
+                      matchedCount:
+                        type: integer
+                        example: 45
+                      postedCount:
+                        type: integer
+                        example: 45
+              example:
+                success: true
+                message: "Test başarılı"
+                data:
+                  processedCount: 150
+                  matchedCount: 45
+                  postedCount: 45
+        '500':
+          description: Test hatası
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Test verileri bulunamadı"
+              example:
+                success: false
+                error: "Test verileri bulunamadı"
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health Check
+      description: |
+        Servisin sağlık durumunu kontrol eder. Servisin çalışır durumda
+        olup olmadığını gösterir.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Servis sağlıklı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-09-30T13:07:32.896Z"
+                  service:
+                    type: string
+                    example: "LinePlan Webhook Server"
+              example:
+                status: "OK"
+                timestamp: "2025-09-30T13:07:32.896Z"
+                service: "LinePlan Webhook Server"
+
+components:
+  schemas:
+    WebhookRequest:
+      type: object
+      required:
+        - season
+        - excelUrl
+      properties:
+        season:
+          type: string
+          description: Sezon kodu
+          example: "25Y"
+        excelUrl:
+          type: string
+          format: uri
+          description: Excel dosya URL'i
+          example: "https://example.com/files/lineplan-data.xlsx"
+
+    WebhookResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: İşlem başarı durumu
+        message:
+          type: string
+          description: İşlem mesajı
+        data:
+          type: object
+          properties:
+            processedCount:
+              type: integer
+              description: İşlenen kayıt sayısı
+            matchedCount:
+              type: integer
+              description: Eşleşen kayıt sayısı
+            postedCount:
+              type: integer
+              description: Gönderilen kayıt sayısı
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Hata mesajı
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API anahtarı (gelecekte güvenlik için kullanılabilir)
+
+tags:
+  - name: Webhook
+    description: LinePlan webhook işlemleri
+  - name: Test
+    description: Test ve debug işlemleri
+  - name: Health
+    description: Servis sağlık kontrolü
