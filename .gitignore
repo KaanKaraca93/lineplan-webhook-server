@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.log
+*.xlsx
+*.json
+test_*.js
+check_*.js
+simple_*.js
+extract_*.js
+*.whl
