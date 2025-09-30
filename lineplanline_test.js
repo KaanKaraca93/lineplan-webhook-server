@@ -1,6 +1,13 @@
+const express = require('express');
 const axios = require('axios');
 const fs = require('fs'); // Dosyaya yazmak için
 const XLSX = require('xlsx'); // Excel işleme için
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
 
 // Token alma fonksiyonu
 async function getToken() {
@@ -346,12 +353,12 @@ async function getLinePlanLineData(token, linePlanId) {
 }
 
 // Ana test fonksiyonu
-async function main() {
+async function processLinePlanData(season, excelUrl) {
     try {
         console.log('🚀 LinePlanLine Test Başlatılıyor...');
         
         // 1. Sezon kodundan LinePlanId'yi bul
-        const seasonCode = '25Y'; // Test için 25Y sezonu
+        const seasonCode = season;
         console.log(`🔍 ${seasonCode} sezonu için LinePlanId aranıyor...`);
         
         const seasonResult = await getLinePlanIdFromSeason(seasonCode);
@@ -381,11 +388,14 @@ async function main() {
             }
         }
 
-        // 4. Excel dosyasını oku ve adet bilgilerini al
-        console.log('\n📄 Excel dosyası okunuyor...');
+        // 4. Excel dosyasını URL'den indir ve oku
+        console.log('\n📄 Excel dosyası indiriliyor...');
         let excelData = [];
         try {
-            const workbook = XLSX.readFile('LinePlan.xlsx');
+            const excelResponse = await axios.get(excelUrl, { responseType: 'arraybuffer' });
+            console.log('✅ Excel dosyası indirildi');
+            
+            const workbook = XLSX.read(excelResponse.data, { type: 'buffer' });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             excelData = XLSX.utils.sheet_to_json(worksheet);
@@ -475,13 +485,91 @@ async function main() {
         if (postResult.success) {
             console.log('✅ PLM POST başarılı!');
             console.log(`📊 ${postResult.postedCount} kayıt başarıyla gönderildi`);
+            return { success: true, postedCount: postResult.postedCount };
         } else {
             console.error('❌ PLM POST başarısız:', postResult.error);
+            return { success: false, error: postResult.error };
         }
         
     } catch (error) {
         console.error('❌ Genel hata:', error.message);
+        return { success: false, error: error.message };
     }
 }
 
-main();
+// Webhook endpoint
+app.post('/webhook', async (req, res) => {
+    try {
+        console.log('📨 Webhook alındı:', req.body);
+        
+        const { season, excelUrl } = req.body;
+        
+        if (!season || !excelUrl) {
+            return res.status(400).json({
+                success: false,
+                error: 'season ve excelUrl gerekli'
+            });
+        }
+        
+        console.log('🚀 LinePlan işlemi başlatılıyor...');
+        console.log(`🔍 Sezon: ${season}`);
+        console.log(`📄 Excel URL: ${excelUrl}`);
+        
+        const result = await processLinePlanData(season, excelUrl);
+        
+        if (result.success) {
+            res.json({
+                status: 'success',
+                message: 'İşlem tamamlandı',
+                data: {
+                    success: result.success,
+                    postedCount: result.postedCount
+                }
+            });
+        } else {
+            res.status(500).json({
+                status: 'error',
+                message: 'İşlem başarısız',
+                error: result.error
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Webhook hatası:', error.message);
+        res.status(500).json({
+            status: 'error',
+            message: 'Webhook hatası',
+            error: error.message
+        });
+    }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        service: 'LinePlan Webhook Server'
+    });
+});
+
+// Test endpoint
+app.get('/test', async (req, res) => {
+    try {
+        console.log('🧪 Test endpoint çağrıldı');
+        const result = await processLinePlanData('25Y', 'https://idm.eu1.inforcloudsuite.com/ca/api/resources/FPLM_Document-14060-2-LATEST?$token=Af9kyRk1jJUoKtepBy2ATE7Q%2BSaC4nZYphLU1Q%2FGBPk9tzewADHL0Zn%2FU89sCIwsQTmqiNrd281L2mTV6cndgpVtyNbGVa0Pz0pD58u9eR0XMSCJ4wf%2FLoFn8z0NSSV%2Bh6vqWTiC4caLMtjArKLg9hBq8NyQ2v6CZd8vxxTnOJypIuKpz9%2Fvh%2Fs7YehRRvooNvrFDXlM8NOzCUCdN9Lnk0I5nl3PqTb8%2Fup845RKleHZXVSo8SLdRK88YSCZkE2lLsTfjy6%2FCmP5IFHksAMgkZYzAEOj%2BX%2FZkKTFP1nEsatZOtZPgRjtSkIJNqHrcSXp5A%2BxceUZpX7UCXotBSwtyFt1o51Fjy6pI2cue2RaSbWGVEggfb62mTYaWQOBW8dok6lOXH5gcif2gX9jjyWrvHPdimGVmz%2B0eL%2Baa2mbF0kaRhe%2Bd7oaGRJZvh0NaFCLVD%2FaJyN57Og%2B6Mhn4CVogA%3D%3D&$tenant=HA286TFZ2VY8TRHK_PRD');
+        
+        res.json(result);
+    } catch (error) {
+        console.error('❌ Test hatası:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Server başlat
+app.listen(PORT, () => {
+    console.log(`🚀 LinePlan Webhook Server ${PORT} portunda çalışıyor`);
+    console.log(`📡 Webhook URL: http://localhost:${PORT}/webhook`);
+    console.log(`🧪 Test URL: http://localhost:${PORT}/test`);
+    console.log(`💚 Health URL: http://localhost:${PORT}/health`);
+});

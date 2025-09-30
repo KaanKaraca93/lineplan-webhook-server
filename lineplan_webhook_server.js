@@ -508,7 +508,7 @@ app.get('/test', async (req, res) => {
         
         // Test için sabit değerler
         const seasonCode = '25Y';
-        const excelUrl = 'https://example.com/test.xlsx'; // Test için dummy URL
+        const excelUrl = 'https://idm.eu1.inforcloudsuite.com/ca/api/resources/FPLM_Document-14060-2-LATEST?$token=Af9kyRk1jJUoKtepBy2ATE7Q%2BSaC4nZYphLU1Q%2FGBPk9tzewADHL0Zn%2FU89sCIwsQTmqiNrd281L2mTV6cndgpVtyNbGVa0Pz0pD58u9eR0XMSCJ4wf%2FLoFn8z0NSSV%2Bh6vqWTiC4caLMtjArKLg9hBq8NyQ2v6CZd8vxxTnOJypIuKpz9%2Fvh%2Fs7YehRRvooNvrFDXlM8NOzCUCdN9Lnk0I5nl3PqTb8%2Fup845RKleHZXVSo8SLdRK88YSCZkE2lLsTfjy6%2FCmP5IFHksAMgkZYzAEOj%2BX%2FZkKTFP1nEsatZOtZPgRjtSkIJNqHrcSXp5A%2BxceUZpX7UCXotBSwtyFt1o51Fjy6pI2cue2RaSbWGVEggfb62mTYaWQOBW8dok6lOXH5gcif2gX9jjyWrvHPdimGVmz%2B0eL%2Baa2mbF0kaRhe%2Bd7oaGRJZvh0NaFCLVD%2FaJyN57Og%2B6Mhn4CVogA%3D%3D&$tenant=HA286TFZ2VY8TRHK_PRD';
         
         const result = await processLinePlanData(seasonCode, excelUrl);
         
