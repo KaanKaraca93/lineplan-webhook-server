@@ -387,6 +387,44 @@ async function processLinePlanData(seasonCode, excelUrl) {
     }
 }
 
+// Webhook endpoint - ION proxy context ile uyumluluk için ekstra route
+app.post('/lineplan-webhook/webhook', async (req, res) => {
+    try {
+        console.log('📨 Webhook alındı (proxy route):', req.body);
+        
+        const { season, excelUrl } = req.body;
+        
+        if (!season || !excelUrl) {
+            return res.status(400).json({
+                success: false,
+                error: 'season ve excelUrl parametreleri gerekli'
+            });
+        }
+        
+        const result = await processLinePlanData(season, excelUrl);
+        
+        if (result.success) {
+            res.json({
+                success: true,
+                message: 'İşlem başarılı',
+                data: result
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                error: result.error
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Webhook hatası:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // Webhook endpoint
 app.post('/webhook', async (req, res) => {
     try {
