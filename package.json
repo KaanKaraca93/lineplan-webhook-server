@@ -2,26 +2,20 @@
   "name": "lineplan-webhook-server",
   "version": "1.0.0",
   "description": "LinePlan Webhook Server for PLM Integration",
-  "main": "lineplan_webhook_server.js",
+  "main": "lineplanline_test.js",
   "scripts": {
-    "start": "node lineplan_webhook_server.js",
+    "start": "node lineplanline_test.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "webhook",
-    "plm",
-    "lineplan",
-    "excel",
-    "integration"
-  ],
-  "author": "KaanKaraca93",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.6.0",
     "xlsx": "^0.18.5"
   },
   "engines": {
-    "node": "18.x"
-  }
+    "node": ">=14.0.0"
+  },
+  "keywords": ["lineplan", "webhook", "plm", "infor"],
+  "author": "Kaan Karaca",
+  "license": "MIT"
 }
