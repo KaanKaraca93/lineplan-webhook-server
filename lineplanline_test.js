@@ -40,12 +40,19 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
     try {
         console.log(`📤 PLM'e POST ediliyor - LinePlanHeaderId: ${linePlanHeaderId}`);
         
-        // Sadece adet bilgisi olan kayıtları filtrele
-        const dataWithAdet = filteredData.filter(item => item.adet !== null);
-        console.log(`📊 POST edilecek kayıt sayısı: ${dataWithAdet.length}`);
+        // Sadece veri olan kayıtları filtrele
+        const dataWithFields = filteredData.filter(item => 
+            item.PlanAdet !== null || item.PlanButce !== null || 
+            item.Oca !== null || item.Sub !== null || item.Mar !== null || 
+            item.Nis !== null || item.May !== null || item.Haz !== null ||
+            item.Tem !== null || item.Agu !== null || item.Eyl !== null ||
+            item.Ekm !== null || item.Kas !== null || item.Ara !== null ||
+            item.ToplamAdet !== null || item.KalanAdet !== null
+        );
+        console.log(`📊 POST edilecek kayıt sayısı: ${dataWithFields.length}`);
         
-        if (dataWithAdet.length === 0) {
-            console.log('⚠️ POST edilecek kayıt yok (adet bilgisi olmayan)');
+        if (dataWithFields.length === 0) {
+            console.log('⚠️ POST edilecek kayıt yok (veri olmayan)');
             return { success: true, message: 'POST edilecek kayıt yok' };
         }
         
@@ -54,19 +61,132 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
             "ModifyId": 3,
             "userId": 3,
             "LinePlanHeaderId": linePlanHeaderId,
-            "LinePlanLines": dataWithAdet.map(item => ({
-                "Key": item.lineplanlineId,
-                "FieldValues": [
-                    {
-                        "FieldName": "Qty",
-                        "Value": item.adet
-                    },
+            "LinePlanLines": dataWithFields.map(item => {
+                const fieldValues = [
                     {
                         "FieldName": "Status",
                         "Value": 2
                     }
-                ]
-            })),
+                ];
+                
+                // Yeni alanları ekle
+                if (item.PlanAdet !== null) {
+                    fieldValues.push({
+                        "FieldName": "NumberOptions",
+                        "Value": item.PlanAdet
+                    });
+                }
+                
+                if (item.PlanButce !== null) {
+                    fieldValues.push({
+                        "FieldName": "NumberCarryOvers",
+                        "Value": item.PlanButce
+                    });
+                }
+                
+                if (item.Oca !== null) {
+                    fieldValues.push({
+                        "FieldName": "279a0732-7ac8-4af2-8520-71e5131d6daf",
+                        "Value": item.Oca
+                    });
+                }
+                
+                if (item.Sub !== null) {
+                    fieldValues.push({
+                        "FieldName": "5f607772-c2fa-46e0-ac0c-3290bc22ec37",
+                        "Value": item.Sub
+                    });
+                }
+                
+                if (item.Mar !== null) {
+                    fieldValues.push({
+                        "FieldName": "c0c79aa2-0a09-42da-b181-58797df4ace3",
+                        "Value": item.Mar
+                    });
+                }
+                
+                if (item.Nis !== null) {
+                    fieldValues.push({
+                        "FieldName": "4c6303f2-da5a-4ee1-94d2-8069dc00d02e",
+                        "Value": item.Nis
+                    });
+                }
+                
+                if (item.May !== null) {
+                    fieldValues.push({
+                        "FieldName": "723aa220-e8ac-4084-84eb-968257096a48",
+                        "Value": item.May
+                    });
+                }
+                
+                if (item.Haz !== null) {
+                    fieldValues.push({
+                        "FieldName": "ee8d4bbb-280c-4701-9ca0-c33df4b9b0ae",
+                        "Value": item.Haz
+                    });
+                }
+                
+                if (item.Tem !== null) {
+                    fieldValues.push({
+                        "FieldName": "65e4f987-7e4a-48a7-a96a-ae3a2a0822d3",
+                        "Value": item.Tem
+                    });
+                }
+                
+                if (item.Agu !== null) {
+                    fieldValues.push({
+                        "FieldName": "fecbf14a-6aa2-4461-a382-25cced5fab9a",
+                        "Value": item.Agu
+                    });
+                }
+                
+                if (item.Eyl !== null) {
+                    fieldValues.push({
+                        "FieldName": "b34869a6-77e8-4f22-b2ea-2e6e1af11d0f",
+                        "Value": item.Eyl
+                    });
+                }
+                
+                if (item.Ekm !== null) {
+                    fieldValues.push({
+                        "FieldName": "1c3a31cf-c105-48f2-8948-3754f97b77fd",
+                        "Value": item.Ekm
+                    });
+                }
+                
+                if (item.Kas !== null) {
+                    fieldValues.push({
+                        "FieldName": "7328fe28-a7f8-478d-b525-e4db400caaf4",
+                        "Value": item.Kas
+                    });
+                }
+                
+                if (item.Ara !== null) {
+                    fieldValues.push({
+                        "FieldName": "52cbe386-ec36-43a9-8bd2-dff14d4714d5",
+                        "Value": item.Ara
+                    });
+                }
+                
+                if (item.ToplamAdet !== null) {
+                    fieldValues.push({
+                        "FieldName": "ActualOptionsRejected",
+                        "Value": item.ToplamAdet
+                    });
+                }
+                
+                if (item.KalanAdet !== null) {
+                    fieldValues.push({
+                        "FieldName": "ActualCarryOvers",
+                        "Value": item.KalanAdet
+                    });
+                }
+                
+                return {
+                    "Key": item.lineplanlineId,
+                    "FieldValues": fieldValues
+                };
+            }),
             "Schema": "FSH2"
         };
         
@@ -103,11 +223,11 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
         console.log('✅ PLM POST başarılı');
         console.log('📊 Response:', response.data);
         
-        return { 
-            success: true, 
-            data: response.data,
-            postedCount: dataWithAdet.length
-        };
+                return {
+                    success: true,
+                    data: response.data,
+                    postedCount: dataWithFields.length
+                };
         
     } catch (error) {
         console.error('❌ PLM POST hatası:');
@@ -440,8 +560,8 @@ async function processLinePlanData(season, excelUrl) {
                 });
             }
             
-            // Excel'den adet bilgisini eşleştir
-            let adet = null;
+            // Excel'den yeni alanları eşleştir
+            let excelFields = {};
             if (excelData.length > 0) {
                 const matchingExcelRow = excelData.find(excelRow => {
                     return excelRow.brandCode === brandCode &&
@@ -449,7 +569,27 @@ async function processLinePlanData(season, excelUrl) {
                            excelRow.categoryCode === categoryCode &&
                            excelRow.subCategoryCode === subCategoryCode;
                 });
-                adet = matchingExcelRow ? (matchingExcelRow.Adet || null) : null;
+                
+                if (matchingExcelRow) {
+                    excelFields = {
+                        PlanAdet: matchingExcelRow.PlanAdet || null,
+                        PlanButce: matchingExcelRow.PlanButce || null,
+                        Oca: matchingExcelRow.Oca || null,
+                        Sub: matchingExcelRow.Sub || null,
+                        Mar: matchingExcelRow.Mar || null,
+                        Nis: matchingExcelRow.Nis || null,
+                        May: matchingExcelRow.May || null,
+                        Haz: matchingExcelRow.Haz || null,
+                        Tem: matchingExcelRow.Tem || null,
+                        Agu: matchingExcelRow.Agu || null,
+                        Eyl: matchingExcelRow.Eyl || null,
+                        Ekm: matchingExcelRow.Ekm || null,
+                        Kas: matchingExcelRow.Kas || null,
+                        Ara: matchingExcelRow.Ara || null,
+                        ToplamAdet: matchingExcelRow.ToplamAdet || null,
+                        KalanAdet: matchingExcelRow.KalanAdet || null
+                    };
+                }
             }
             
             return {
@@ -458,14 +598,14 @@ async function processLinePlanData(season, excelUrl) {
                 divisionCode: divisionCode,
                 categoryCode: categoryCode,
                 subCategoryCode: subCategoryCode,
-                adet: adet
+                ...excelFields
             };
         });
 
         console.log(`📊 Toplam ${filteredData.length} kayıt filtrelendi`);
         
         // Eşleşme istatistikleri
-        const matchedCount = filteredData.filter(item => item.adet !== null).length;
+        const matchedCount = filteredData.filter(item => item.PlanAdet !== null || item.PlanButce !== null).length;
         console.log(`📊 Excel ile eşleşen kayıt: ${matchedCount}/${filteredData.length} (%${((matchedCount/filteredData.length)*100).toFixed(1)})`);
         
         console.log('\n📋 İlk 3 kayıt (debug ile):');
