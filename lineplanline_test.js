@@ -42,12 +42,7 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
         
         // Sadece veri olan kayıtları filtrele
         const dataWithFields = filteredData.filter(item => 
-            item.PlanAdet !== null || item.PlanButce !== null || 
-            item.Oca !== null || item.Sub !== null || item.Mar !== null || 
-            item.Nis !== null || item.May !== null || item.Haz !== null ||
-            item.Tem !== null || item.Agu !== null || item.Eyl !== null ||
-            item.Ekm !== null || item.Kas !== null || item.Ara !== null ||
-            item.ToplamAdet !== null || item.KalanAdet !== null
+            item.PlanOption !== null || item.PlanButce !== null
         );
         console.log(`📊 POST edilecek kayıt sayısı: ${dataWithFields.length}`);
         
@@ -62,125 +57,137 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
             "userId": 3,
             "LinePlanHeaderId": linePlanHeaderId,
             "LinePlanLines": dataWithFields.map(item => {
-                const fieldValues = [
-                    {
-                        "FieldName": "Status",
-                        "Value": 2
-                    }
-                ];
+                const fieldValues = [];
                 
-                // Yeni alanları ekle
-                if (item.PlanAdet !== null) {
+                // Sadece 3 alan: Status, PlanOption, PlanButce
+                // Status alanı
+                fieldValues.push({
+                    "FieldName": "Status",
+                    "Value": 2
+                });
+                
+                if (item.PlanOption !== null && item.PlanOption !== undefined) {
                     fieldValues.push({
                         "FieldName": "NumberOptions",
-                        "Value": item.PlanAdet
+                        "Value": item.PlanOption
                     });
                 }
                 
-                if (item.PlanButce !== null) {
+                if (item.PlanButce !== null && item.PlanButce !== undefined) {
                     fieldValues.push({
                         "FieldName": "NumberCarryOvers",
                         "Value": item.PlanButce
                     });
                 }
                 
-                if (item.Oca !== null) {
+                /*
+                // Diğer alanları geçici olarak devre dışı bırak
+                
+                if (item.PlanButce !== null && item.PlanButce !== undefined) {
+                    fieldValues.push({
+                        "FieldName": "NumberCarryOvers",
+                        "Value": item.PlanButce
+                    });
+                }
+                
+                if (item.Oca !== null && item.Oca !== undefined) {
                     fieldValues.push({
                         "FieldName": "279a0732-7ac8-4af2-8520-71e5131d6daf",
                         "Value": item.Oca
                     });
                 }
                 
-                if (item.Sub !== null) {
+                if (item.Sub !== null && item.Sub !== undefined) {
                     fieldValues.push({
                         "FieldName": "5f607772-c2fa-46e0-ac0c-3290bc22ec37",
                         "Value": item.Sub
                     });
                 }
                 
-                if (item.Mar !== null) {
+                if (item.Mar !== null && item.Mar !== undefined) {
                     fieldValues.push({
                         "FieldName": "c0c79aa2-0a09-42da-b181-58797df4ace3",
                         "Value": item.Mar
                     });
                 }
                 
-                if (item.Nis !== null) {
+                if (item.Nis !== null && item.Nis !== undefined) {
                     fieldValues.push({
                         "FieldName": "4c6303f2-da5a-4ee1-94d2-8069dc00d02e",
                         "Value": item.Nis
                     });
                 }
                 
-                if (item.May !== null) {
+                if (item.May !== null && item.May !== undefined) {
                     fieldValues.push({
                         "FieldName": "723aa220-e8ac-4084-84eb-968257096a48",
                         "Value": item.May
                     });
                 }
                 
-                if (item.Haz !== null) {
+                if (item.Haz !== null && item.Haz !== undefined) {
                     fieldValues.push({
                         "FieldName": "ee8d4bbb-280c-4701-9ca0-c33df4b9b0ae",
                         "Value": item.Haz
                     });
                 }
                 
-                if (item.Tem !== null) {
+                if (item.Tem !== null && item.Tem !== undefined) {
                     fieldValues.push({
                         "FieldName": "65e4f987-7e4a-48a7-a96a-ae3a2a0822d3",
                         "Value": item.Tem
                     });
                 }
                 
-                if (item.Agu !== null) {
+                if (item.Agu !== null && item.Agu !== undefined) {
                     fieldValues.push({
                         "FieldName": "fecbf14a-6aa2-4461-a382-25cced5fab9a",
                         "Value": item.Agu
                     });
                 }
                 
-                if (item.Eyl !== null) {
+                if (item.Eyl !== null && item.Eyl !== undefined) {
                     fieldValues.push({
                         "FieldName": "b34869a6-77e8-4f22-b2ea-2e6e1af11d0f",
                         "Value": item.Eyl
                     });
                 }
                 
-                if (item.Ekm !== null) {
+                if (item.Ekm !== null && item.Ekm !== undefined) {
                     fieldValues.push({
                         "FieldName": "1c3a31cf-c105-48f2-8948-3754f97b77fd",
                         "Value": item.Ekm
                     });
                 }
                 
-                if (item.Kas !== null) {
+                if (item.Kas !== null && item.Kas !== undefined) {
                     fieldValues.push({
                         "FieldName": "7328fe28-a7f8-478d-b525-e4db400caaf4",
                         "Value": item.Kas
                     });
                 }
                 
-                if (item.Ara !== null) {
+                if (item.Ara !== null && item.Ara !== undefined) {
                     fieldValues.push({
                         "FieldName": "52cbe386-ec36-43a9-8bd2-dff14d4714d5",
                         "Value": item.Ara
                     });
                 }
                 
-                if (item.ToplamAdet !== null) {
+                if (item.ToplamAdet !== null && item.ToplamAdet !== undefined) {
                     fieldValues.push({
                         "FieldName": "ActualOptionsRejected",
                         "Value": item.ToplamAdet
                     });
                 }
                 
-                if (item.KalanAdet !== null) {
+                if (item.KalanAdet !== null && item.KalanAdet !== undefined) {
                     fieldValues.push({
                         "FieldName": "ActualCarryOvers",
                         "Value": item.KalanAdet
                     });
                 }
+                */
                 
                 return {
                     "Key": item.lineplanlineId,
@@ -510,10 +517,13 @@ async function processLinePlanData(season, excelUrl) {
 
         // 4. Excel dosyasını URL'den indir ve oku
         console.log('\n📄 Excel dosyası indiriliyor...');
+        console.log('📄 Excel URL:', excelUrl);
         let excelData = [];
         try {
             const excelResponse = await axios.get(excelUrl, { responseType: 'arraybuffer' });
             console.log('✅ Excel dosyası indirildi');
+            console.log('📄 Excel response status:', excelResponse.status);
+            console.log('📄 Excel response size:', excelResponse.data.length);
             
             const workbook = XLSX.read(excelResponse.data, { type: 'buffer' });
             const sheetName = workbook.SheetNames[0];
@@ -572,22 +582,8 @@ async function processLinePlanData(season, excelUrl) {
                 
                 if (matchingExcelRow) {
                     excelFields = {
-                        PlanAdet: matchingExcelRow.PlanAdet || null,
-                        PlanButce: matchingExcelRow.PlanButce || null,
-                        Oca: matchingExcelRow.Oca || null,
-                        Sub: matchingExcelRow.Sub || null,
-                        Mar: matchingExcelRow.Mar || null,
-                        Nis: matchingExcelRow.Nis || null,
-                        May: matchingExcelRow.May || null,
-                        Haz: matchingExcelRow.Haz || null,
-                        Tem: matchingExcelRow.Tem || null,
-                        Agu: matchingExcelRow.Agu || null,
-                        Eyl: matchingExcelRow.Eyl || null,
-                        Ekm: matchingExcelRow.Ekm || null,
-                        Kas: matchingExcelRow.Kas || null,
-                        Ara: matchingExcelRow.Ara || null,
-                        ToplamAdet: matchingExcelRow.ToplamAdet || null,
-                        KalanAdet: matchingExcelRow.KalanAdet || null
+                        PlanOption: matchingExcelRow.PlanOption || null,
+                        PlanButce: matchingExcelRow.PlanButce || null
                     };
                 }
             }
@@ -605,7 +601,7 @@ async function processLinePlanData(season, excelUrl) {
         console.log(`📊 Toplam ${filteredData.length} kayıt filtrelendi`);
         
         // Eşleşme istatistikleri
-        const matchedCount = filteredData.filter(item => item.PlanAdet !== null || item.PlanButce !== null).length;
+        const matchedCount = filteredData.filter(item => item.PlanOption !== null || item.PlanButce !== null).length;
         console.log(`📊 Excel ile eşleşen kayıt: ${matchedCount}/${filteredData.length} (%${((matchedCount/filteredData.length)*100).toFixed(1)})`);
         
         console.log('\n📋 İlk 3 kayıt (debug ile):');
@@ -697,7 +693,7 @@ app.get('/health', (req, res) => {
 app.get('/test', async (req, res) => {
     try {
         console.log('🧪 Test endpoint çağrıldı');
-        const result = await processLinePlanData('25Y', 'https://idm.eu1.inforcloudsuite.com/ca/api/resources/FPLM_Document-14060-2-LATEST?$token=Af9kyRk1jJUoKtepBy2ATE7Q%2BSaC4nZYphLU1Q%2FGBPk9tzewADHL0Zn%2FU89sCIwsQTmqiNrd281L2mTV6cndgpVtyNbGVa0Pz0pD58u9eR0XMSCJ4wf%2FLoFn8z0NSSV%2Bh6vqWTiC4caLMtjArKLg9hBq8NyQ2v6CZd8vxxTnOJypIuKpz9%2Fvh%2Fs7YehRRvooNvrFDXlM8NOzCUCdN9Lnk0I5nl3PqTb8%2Fup845RKleHZXVSo8SLdRK88YSCZkE2lLsTfjy6%2FCmP5IFHksAMgkZYzAEOj%2BX%2FZkKTFP1nEsatZOtZPgRjtSkIJNqHrcSXp5A%2BxceUZpX7UCXotBSwtyFt1o51Fjy6pI2cue2RaSbWGVEggfb62mTYaWQOBW8dok6lOXH5gcif2gX9jjyWrvHPdimGVmz%2B0eL%2Baa2mbF0kaRhe%2Bd7oaGRJZvh0NaFCLVD%2FaJyN57Og%2B6Mhn4CVogA%3D%3D&$tenant=HA286TFZ2VY8TRHK_PRD');
+        const result = await processLinePlanData('25Y', 'https://idm.eu1.inforcloudsuite.com/ca/api/resources/FPLM_Document-83723-2-LATEST?$token=AWn4uvIcTf5%2BRpQW3xZCCcAJEf5%2Fz02gg7eR3DRIWiENolEgEbeQpaogIltoF%2BrLM%2BPuk8kSh0aK3RSykivgvv8rVMsKg1DEiVkBJsRDqVzjkyj5JUgT3b6UhsEZ626nIvAKPB%2FLLTzxLM70mkzV7kQVJO3Sk3c0WLLuWqGfn3OoFhthmubBiCqXQVZn7BLqOYkQYvxsKZCopzH7d0LTPSn%2Bzp5IRDFML0nYx4mYZsqQOALQI2qjLVALyrFYNgD97Q4MTcXRdWpweHxsxnNR%2BOlHe80jiyH1MQpWGHYhr61FXcbuYAZWR5N%2FYWSqFvmdj4hLNfadURRwplqBsBPrxV1Nk9qqiQx5dK2SRbKavNc0OxWpRpBfHUw2qifCH6AMNxsZlnLGckCc00Ga6Jhsj6SsvicwlPiWpymHluyPoBdkD%2FFkFHPh4R%2B8VJ39Ts493xVTxPbQ3SfHt2OHzpLc&$tenant=JKARFH4LCGZA78A5_PRD');
         
         res.json(result);
     } catch (error) {
