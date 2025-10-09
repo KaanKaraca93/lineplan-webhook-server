@@ -13,13 +13,13 @@ app.use(express.json());
 async function getToken() {
     try {
         const tokenResponse = await axios.post(
-            'https://mingle-sso.eu1.inforcloudsuite.com:443/HA286TFZ2VY8TRHK_PRD/as/token.oauth2',
+            `https://mingle-sso.eu1.inforcloudsuite.com:443/${process.env.PLM_TENANT}/as/token.oauth2`,
             {
                 grant_type: 'password',
-                client_id: 'HA286TFZ2VY8TRHK_PRD~jVqIxgO0vQbUjppuaNrbaQq6vhsxRYiRMZeKKKKu6Ng',
-                client_secret: 'fBFip3OjD6Z3RMyuNQYqhTQIv3_UmoYDtdWS-_yIaBTiDlnSqClZyTJVcqvhHeR_-j8MH4ZAAZRru-f5fFOlJA',
-                username: 'HA286TFZ2VY8TRHK_PRD#cHMnkbYAUV7OpjA5HypO21I7dAS5H4wlS_TYzvpsw7Ftk75Ucy1uqVm6mgTinSfuh51OJl-NlAyE0_jlaZxxag',
-                password: 'THJoUh_JfB5yGOosp4HshQpAzIUodF_RBp8_DjiJyga6FQD1eKQzqEk4OyHIhDmBtMKWjsWA5IuCW0pZFVgWLA'
+                client_id: process.env.PLM_CLIENT_ID,
+                client_secret: process.env.PLM_CLIENT_SECRET,
+                username: process.env.PLM_USERNAME,
+                password: process.env.PLM_PASSWORD
             },
             {
                 headers: {
