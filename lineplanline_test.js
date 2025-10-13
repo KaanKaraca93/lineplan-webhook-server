@@ -213,7 +213,7 @@ async function postLinePlanData(token, linePlanHeaderId, filteredData) {
         
         // API'ye POST et
         const response = await axios.post(
-            'https://prd-euc1.fplm.eu1.inforcloudsuite.com/api/lineplan/lineplanline/save',
+            'https://mingle-ionapi.eu1.inforcloudsuite.com/HA286TFZ2VY8TRHK_PRD/FASHIONPLM/odata2/api/lineplan/lineplanline/save',
             payload,
             {
                 headers: {
@@ -276,7 +276,7 @@ async function getLinePlanIdFromSeason(seasonCode) {
 
         // LinePlanHeader API çağrısı
         const apiResponse = await axios.post(
-            'https://prd-euc1.fplm.eu1.inforcloudsuite.com/api/view/entity/data/get',
+            'https://mingle-ionapi.eu1.inforcloudsuite.com/HA286TFZ2VY8TRHK_PRD/FASHIONPLM/odata2/api/view/entity/data/get',
             {
                 "roleId": 1003,
                 "userId": "3",
@@ -341,7 +341,7 @@ async function getLinePlanLineData(token, linePlanId) {
         console.log(`🔍 LinePlanLine API çağrısı yapılıyor - LinePlanId: ${linePlanId}`);
         
         const response = await axios.post(
-            'https://prd-euc1.fplm.eu1.inforcloudsuite.com/api/view/entity/data/get',
+            'https://mingle-ionapi.eu1.inforcloudsuite.com/HA286TFZ2VY8TRHK_PRD/FASHIONPLM/odata2/api/view/entity/data/get',
             {
                 "roleId": 1008,
                 "userId": "15",
